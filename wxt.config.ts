@@ -1,14 +1,15 @@
-import { defineConfig } from 'wxt';
-import path from "path"
-import tailwindcss from "@tailwindcss/vite"
+import { defineConfig } from "wxt";
+import path from "path";
+import tailwindcss from "@tailwindcss/vite";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
-  modules: ['@wxt-dev/module-react'],
+  modules: ["@wxt-dev/module-react"],
   dev: {
     server: {
-      port: 5173
-    }
+      port: 5173,
+    },
   },
   manifest: {
     name: "Blackbox",
@@ -16,28 +17,40 @@ export default defineConfig({
       16: "icon/icon16.png",
       32: "icon/icon32.png",
       48: "icon/icon48.png",
-      128: "icon/icon128.png"
+      128: "icon/icon128.png",
     },
-    "web_accessible_resources":[
+    web_accessible_resources: [
       {
-        "resources": [ "captureConsole.js" ],
-        "matches": [ "<all_urls>" ]
-      },
-      {
-        "resources": [ "captureNetwork.js" ],
-        "matches": [ "<all_urls>" ]
+        resources: ["inject.js"],
+        matches: ["<all_urls>"],
       }
-    ]
+    ],
   },
   vite: () => ({
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), viteStaticCopy({
+      targets: [
+        { src: 'node_modules/chii/public/front_end/core/i18n/locales', dest: '' },
+        { src: 'node_modules/chii/public/front_end/Images/*', dest: '' },
+      ]
+    })],
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./")
-      }
+        "@": path.resolve(__dirname, "./"),
+      },
     },
     esbuild: {
-      charset: 'ascii'
-    }
-  })
+      charset: "ascii",
+    },
+    build: {
+      target: "esnext",
+    },
+    optimizeDeps: {
+      exclude: ["chii", "chobitsu"],
+    },
+    server: {
+      watch: {
+        ignored: ["node_modules/chii/**", "node_modules/chobitsu/**"],
+      },
+    },
+  }),
 });
