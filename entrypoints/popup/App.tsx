@@ -11,6 +11,7 @@ import {
   Skeleton,
 } from "@/components/ui";
 import { saveRecording, saveRecordingListItem, cleanupOldRecordings, RecordingData, RecordingListItem } from "@/lib/db";
+import { Events } from "@/lib/events";
 
 function App() {
 
@@ -25,7 +26,7 @@ function App() {
     try {
       const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       if (tab.id) {
-        const response = await browser.tabs.sendMessage(tab.id, { action: "getRecordingStatus" });
+        const response = await browser.tabs.sendMessage(tab.id, { action: Events.getRecordingStatus });
         setIsRecording(response?.isRecording || false);
       }
     } catch (error) {
@@ -38,7 +39,7 @@ function App() {
       setIsLoading(true);
       const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       if (tab.id) {
-        const response = await browser.tabs.sendMessage(tab.id, { action: "startRecording" });
+        const response = await browser.tabs.sendMessage(tab.id, { action: Events.startRecording });
         if (response?.success) {
           setIsRecording(true);
         }
@@ -55,7 +56,7 @@ function App() {
       setIsLoading(true);
       const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       if (tab.id) {
-        const response = await browser.tabs.sendMessage(tab.id, { action: "stopRecording" });
+        const response = await browser.tabs.sendMessage(tab.id, { action: Events.stopRecording });
         if (response?.success && response.events) {
           const recordingId = `recording_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           const recordingData: RecordingData = {

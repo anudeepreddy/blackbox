@@ -127,7 +127,7 @@ function App() {
 
           replayer.addEventListener("custom-event", (events) => {
             console.log("custom-event", events);
-            if (events.data.tag === "chobitsu") {
+            if (events.data.tag === "cdp") {
               devtoolsRef.current?.contentWindow?.postMessage(
                 events.data.payload,
                 "*"

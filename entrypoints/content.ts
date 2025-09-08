@@ -1,5 +1,6 @@
 import { browser } from "wxt/browser";
 import { record } from "rrweb";
+import { ContentToInjectEvents, Events, InjectToContentEvents } from "@/lib/events";
 
 async function main(ctx) {
   if (ctx.isInvalid) {
@@ -10,11 +11,19 @@ async function main(ctx) {
     keepInDom: true,
   });
 
+  function sendMessage(event: any) {
+    window.postMessage(
+      {
+        source: event,
+      },
+      "*"
+    );
+  }
   window.addEventListener("message", (event) => {
-    if (event.source === window && event.data.source === "chobitsu") {
+    if (event.source === window && event.data.source === InjectToContentEvents.onCdp) {
       //@ts-ignore
       const message = event.data.message;
-      record.addCustomEvent("chobitsu", message);
+      record.addCustomEvent("cdp", message);
     }
   });
 
@@ -24,13 +33,15 @@ async function main(ctx) {
   let events: any[] = [];
 
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "startRecording") {
+    if (message.action === Events.startRecording) {
       startRecording();
+      sendMessage(ContentToInjectEvents.startCdp);
       (sendResponse as any)({ success: true, message: "Recording started" });
-    } else if (message.action === "stopRecording") {
+    } else if (message.action === Events.stopRecording) {
       const recordedEvents = stopRecordingAndGetEvents();
+      sendMessage(ContentToInjectEvents.startCdp);
       (sendResponse as any)({ success: true, events: recordedEvents });
-    } else if (message.action === "getRecordingStatus") {
+    } else if (message.action === Events.getRecordingStatus) {
       (sendResponse as any)({ isRecording: stopRecording !== null });
     }
 

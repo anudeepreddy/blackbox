@@ -1,4 +1,7 @@
+import { ContentToInjectEvents, Events, InjectToContentEvents } from "@/lib/events";
+
 async function main() {
+  let isCdpEnabled = false;
   const chobitsu = (await import("chobitsu")).default;
   let id = 0;
   const sendToChobitsu = (message) => {
@@ -7,9 +10,10 @@ async function main() {
   };
 
   function sendMessage(data: any) {
+    if(!isCdpEnabled) return;
     window.postMessage(
       {
-        source: "chobitsu",
+        source: InjectToContentEvents.onCdp,
         message: data,
       },
       "*"
@@ -42,6 +46,17 @@ async function main() {
       }, 1000);
     }
     sendMessage(message);
+  });
+
+  window.addEventListener("message", (event) => {
+    if(event.source === window && event.data.source === ContentToInjectEvents.startCdp) {
+      isCdpEnabled = true;
+      return;
+    }
+    if(event.source === window && event.data.source === ContentToInjectEvents.stopCdp) {
+      isCdpEnabled = false;
+      return;
+    }
   });
 
   sendToChobitsu({ method: "Network.enable" });
