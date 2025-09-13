@@ -1,9 +1,10 @@
 # Blackbox
 
 **Blackbox** is a web extension that records user interactions, console logs, and network requests on websites. It provides a seamless way to capture, review, and share browser sessions for debugging, QA, or user experience analysis.
+
 <p align="center">
-    <a href="https://www.loom.com/share/30526c9071c044dd833b2a05bcddbd2f">
-      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/30526c9071c044dd833b2a05bcddbd2f-226f7c47a367e83c-full-play.gif">
+    <a href="https://www.loom.com/share/584ea05284b246cda642cf77d4953579">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/584ea05284b246cda642cf77d4953579-e5f5346ba93bd031-full-play.gif">
     </a>
   </p>
   
