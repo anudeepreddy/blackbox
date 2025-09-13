@@ -18,6 +18,18 @@
 
 ### Installation
 
+#### Prebuilt
+
+1. Get the latest release from: https://github.com/anudeepreddy/blackbox/releases
+2. Unzip the downloaded file
+3. Open Chrome and go to chrome://extensions/
+4. Enable "Developer mode" (toggle in top right)
+5. Click "Load unpacked" button
+6. Select the folder where you extracted the extension
+7. The extension will load and appear in your list
+
+#### From Source
+
 1. **Clone the Repo:**
    ```bash
    git clone https://github.com/anudeepreddy/blackbox.git
