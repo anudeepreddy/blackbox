@@ -16,7 +16,7 @@ export const exportRecording = async (recordingId: string) => {
       }
 
       
-      const dataStr = JSON.stringify(recordingData.events, null, 2);
+      const dataStr = JSON.stringify({events: recordingData.events, responseData: recordingData.responseDataMap}, null, 2);
       const dataBlob = new Blob([dataStr], { type: "application/json" });
 
       

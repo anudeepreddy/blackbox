@@ -10,5 +10,6 @@ export const ContentToInjectEvents = {
 }
 
 export const InjectToContentEvents = {
-    onCdp: 'blackbox.onCdp'
+    onCdp: 'blackbox.onCdp',
+    onResponseData: 'blackbox.responseData'
 }

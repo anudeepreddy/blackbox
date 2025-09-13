@@ -25,22 +25,29 @@ async function main(ctx) {
       const message = event.data.message;
       record.addCustomEvent("cdp", message);
     }
+
+    if(event.source === window && event.data.source === InjectToContentEvents.onResponseData) {
+      const message = event.data.message;
+      responseDataMap[message.requestId] = {
+        ...message,
+        requestId: undefined
+      }
+    }
   });
 
   type RecordHandler = () => void;
 
   let stopRecording: RecordHandler | null = null;
   let events: any[] = [];
+  let responseDataMap: Record<string, any> = {}
 
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === Events.startRecording) {
       startRecording();
-      sendMessage(ContentToInjectEvents.startCdp);
       (sendResponse as any)({ success: true, message: "Recording started" });
     } else if (message.action === Events.stopRecording) {
-      const recordedEvents = stopRecordingAndGetEvents();
-      sendMessage(ContentToInjectEvents.startCdp);
-      (sendResponse as any)({ success: true, events: recordedEvents });
+      const recording = stopAndGetRecording();
+      (sendResponse as any)({ success: true, recording });
     } else if (message.action === Events.getRecordingStatus) {
       (sendResponse as any)({ isRecording: stopRecording !== null });
     }
@@ -72,12 +79,13 @@ async function main(ctx) {
     if (recordHandler) {
       stopRecording = recordHandler;
       console.log("Recording started successfully");
+      sendMessage(ContentToInjectEvents.startCdp);
     } else {
       console.error("Failed to start recording");
     }
   }
 
-  function stopRecordingAndGetEvents() {
+  function stopAndGetRecording() {
     if (!stopRecording) {
       console.log("No recording in progress");
       return [];
@@ -86,12 +94,14 @@ async function main(ctx) {
     console.log("Stopping recording...");
     stopRecording();
     stopRecording = null;
-
+    sendMessage(ContentToInjectEvents.stopCdp);
     const recordedEvents = [...events];
+    const recordedResponseBody = {...responseDataMap}
     events = [];
+    responseDataMap = {};
 
     console.log(`Recording stopped. Captured ${recordedEvents.length} events`);
-    return recordedEvents;
+    return {events: recordedEvents, responseDataMap: recordedResponseBody};
   }
 }
 

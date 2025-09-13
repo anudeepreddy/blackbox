@@ -80,7 +80,7 @@ function App() {
       const data = JSON.parse(text);
 
       let events: any[];
-      let networkEvents: any[] = [];
+      let responseDataMap: {} = {};
       let originalData: any = {};
 
       
@@ -91,7 +91,7 @@ function App() {
       } else if (data.events && Array.isArray(data.events)) {
         
         events = data.events;
-        networkEvents = data.networkEvents || [];
+        responseDataMap = data.responseDataMap || {};
         originalData = data;
       } else {
         throw new Error("Invalid recording file: Expected either an events array or an object with an events property");
@@ -108,6 +108,7 @@ function App() {
       const recordingData: RecordingData = {
         id: recordingId,
         events: events,
+        responseDataMap
       };
 
       await saveRecording(recordingData);

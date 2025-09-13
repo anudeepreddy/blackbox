@@ -3,6 +3,7 @@ import { openDB, DBSchema, IDBPDatabase } from 'idb';
 export interface RecordingData {
   id: string;
   events: any[];
+  responseDataMap: any
 }
 
 export interface RecordingListItem {

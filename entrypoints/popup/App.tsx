@@ -57,11 +57,13 @@ function App() {
       const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       if (tab.id) {
         const response = await browser.tabs.sendMessage(tab.id, { action: Events.stopRecording });
-        if (response?.success && response.events) {
+        if (response?.success && response?.recording?.events) {
+          const {events, responseDataMap} = response.recording;
           const recordingId = `recording_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           const recordingData: RecordingData = {
             id: recordingId,
-            events: response.events,
+            events,
+            responseDataMap
           };
           
           await saveRecording(recordingData);
@@ -72,7 +74,7 @@ function App() {
             url: tab.url,
             title: tab.title,
             domain: new URL(tab.url || "about:blank").hostname,
-            eventCount: response.events.length
+            eventCount: events.length
           } satisfies RecordingListItem);
                     
           await browser.tabs.create({

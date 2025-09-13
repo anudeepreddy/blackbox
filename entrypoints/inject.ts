@@ -19,6 +19,16 @@ async function main() {
       "*"
     );
   }
+
+  function sendNetworkData(data) {
+    if(!isCdpEnabled) return;
+    window.postMessage({
+      source: InjectToContentEvents.onResponseData,
+      message: data
+    })
+  }
+  
+
   chobitsu.setOnMessage((message) => {
     if (message.includes('"id":"tmp')) return;
     const parsedMsg = JSON.parse(message);
@@ -29,21 +39,16 @@ async function main() {
           .domain("Network")
           .getResponseBody({requestId: parsedMsg.params.requestId});
 
-        if (response.data) {
-          sendMessage(
-            JSON.stringify({
-              method: "Network.dataReceived",
-              params: {
+        if (response.body) {
+          sendNetworkData(
+            {
                 requestId: parsedMsg.params.requestId,
-                timestamp: parsedMsg.params.timestamp,
-                dataLength: response.data.length,
-                encodedDataLength: parsedMsg.params.response?.encodedDataLength,
-                body: Buffer.from(response.data).toString('base64'),
-              },
-            })
+                ...response
+            }
           );
         }
       }, 1000);
+      return;
     }
     sendMessage(message);
   });

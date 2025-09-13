@@ -3,29 +3,9 @@ import rrwebPlayer from "rrweb-player";
 import "rrweb-player/dist/style.css";
 import {
   Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Separator,
-  ScrollArea,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  Badge,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from "@/components/ui";
 import { Filter, Download, RefreshCw, ChevronsUpDown } from "lucide-react";
 import { getRecording } from "@/lib/db";
@@ -52,6 +32,7 @@ interface ReplayData {
 function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const devtoolsRef = useRef<HTMLIFrameElement>(null);
+  const [responseData, setResponseData] = useState({});
 
   const sendToDevtools = (message) => {
     devtoolsRef.current?.contentWindow?.postMessage(
@@ -89,6 +70,11 @@ function App() {
             },
           },
         });
+      } else if(cdpMessage.method === 'Network.getResponseBody') {
+        sendToDevtools({
+          id: cdpMessage.id,
+          result: responseData[cdpMessage.params.requestId]
+        })
       } else {
         sendToDevtools({
           id: cdpMessage.id,
@@ -98,7 +84,7 @@ function App() {
     }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [responseData]);
 
   useEffect(() => {
     handlePlay();
@@ -123,6 +109,7 @@ function App() {
               maxScale: 0,
             },
           });
+          setResponseData(data.responseDataMap);
           replayer.play();
 
           replayer.addEventListener("custom-event", (events) => {
