@@ -2,7 +2,7 @@
   "name": "blackbox",
   "description": "A web extension designed to: record user interactions, console logs, and network activity.",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
